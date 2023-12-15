@@ -1,0 +1,53 @@
+#!/bin/sh
+
+set -x
+
+if [ "$DISKSIZE" == "" ]; then
+	printf "Specify disk size in \$DISKSIZE\n"
+	exit -1
+fi
+if [ "$DISKCHUNKS" == "" ]; then
+	printf "Specify disk chunk size in \$DISKSIZE\n"
+	exit -1
+fi
+
+if [ "$1" == "" ]; then
+	printf "Specify output disk as first argument\n"
+	exit -1
+fi
+
+if [ "$2" == "" ]; then
+	printf "Specify system directory as second argument\n"
+	exit -1
+fi
+
+DISKFILE=$1
+
+dd if=/dev/zero of=$DISKFILE bs=$DISKCHUNKS count=$DISKSIZE 
+
+echo "
+o
+
+n
+
+
+
+t
+1
+
+w" | fdisk $DISKFILE
+
+LODEV=`sudo losetup -o $[2048*512] --sizelimit $[16*1024*1024] -f $DISKFILE --show`
+
+sudo mkfs.fat -F 16 $LODEV
+
+sudo mount --mkdir $LODEV /mnt/loopmnt
+
+sudo grub-install --modules=part_msdos --target=x86_64-efi --boot-directory=/mnt/loopmnt --efi-directory=/mnt/loopmnt --bootloader-id=GRUB $LODEV 
+
+sudo cp grub.cfg /mnt/loopmnt/grub/grub.cfg
+sudo cp boot_kernel.elf /mnt/loopmnt/boot_kernel
+sudo cp kernel.elf /mnt/loopmnt/kernel
+
+sudo umount /mnt/loopmnt
+sudo losetup -d $LODEV
