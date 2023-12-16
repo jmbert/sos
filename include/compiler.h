@@ -17,4 +17,10 @@
 
 #define __noreturn [[noreturn]]
 
+#define __packed [[gnu::packed]]
+
+#define __align(_n) [[gnu::aligned(_n)]]
+
+#define __fail __builtin_unreachable
+
 #endif

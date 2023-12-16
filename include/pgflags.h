@@ -60,18 +60,18 @@
 #define PDE_R 1<<11
 #define PDE_XD 1<<63
 
-#define PDTE_P 1<<0 
-#define PDTE_RW 1<<1 
-#define PDTE_US 1<<2 
-#define PDTE_PWT 1<<3 
-#define PDTE_PCD 1<<4 
-#define PDTE_A 1<<5 
-#define PDTR_D 1<<6
-#define PDTE_PAT 1<<7 
-#define PDTE_G 1<<8
-#define PDTE_R 1<<11
-#define PDTE_PK 1<<59
-#define PDTE_XD 1<<63
+#define PTE_P 1<<0 
+#define PTE_RW 1<<1 
+#define PTE_US 1<<2 
+#define PTE_PWT 1<<3 
+#define PTE_PCD 1<<4 
+#define PTE_A 1<<5 
+#define PTR_D 1<<6
+#define PTE_PAT 1<<7 
+#define PTE_G 1<<8
+#define PTE_R 1<<11
+#define PTE_PK 1<<59
+#define PTE_XD 1<<63
 
 
 #endif

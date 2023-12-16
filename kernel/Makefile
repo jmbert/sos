@@ -12,9 +12,10 @@
 #    GNU General Public License for more details.
 
 SRCS=\
+	_start.S\
 	init.c
 
-OBJS=$(patsubst %.c,%.o,$(SRCS))
+OBJS=$(patsubst %.S,%.o,$(patsubst %.c,%.o,$(SRCS)))
 DEPS=$(OBJS:.o=.d)
 
 CFLAGS+=-mcmodel=large
@@ -22,6 +23,12 @@ CFLAGS+=-mcmodel=large
 ARCHIVE= $(notdir $(CURDIR)).a
 
 all: $(OBJS) $(ARCHIVE)
+
+
+%.o:%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
+%.o:%.S
+	$(CC) -c $(CFLAGS) -o $@ $<
 
 clean:
 	-rm $(OBJS)

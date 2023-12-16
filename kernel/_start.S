@@ -12,38 +12,8 @@
     GNU General Public License for more details.
 */
 
-ENTRY(_start)
 
-HIGHER_HALF = 0xC0000000;
-KERNEL_VMA = HIGHER_HALF+1M;
+.global _start
 
-SECTIONS
-{
-	. = KERNEL_VMA;
-
-	.text : AT ( ADDR ( .text ) - KERNEL_VMA )
-	{
-		
-		* ( .text )
-		. = ALIGN ( 4096 );
-	}
-
-	.data : AT ( ADDR ( .data ) - KERNEL_VMA )
-	{
-		* ( .data )
-	}
-
-	.bss : AT ( ADDR ( .bss ) - KERNEL_VMA )
-	{
-		* ( .bss )
-
-		* ( COMMON )
-	}
-
-	_KERNEL_END = .;
-
-	/DISCARD/ :
-	{
-		* ( .comment )
-	}
-}
+_start:
+	jmp _start

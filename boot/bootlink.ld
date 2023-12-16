@@ -9,19 +9,20 @@ BOOT_HIGHER_OFFSET = 0xC0000000;
 SECTIONS
 {
 	. = BOOT_KERNEL_BEGIN;
+	. += BOOT_HIGHER_OFFSET;
 
-	.text ALIGN ( 4096 ) : 
+	.text ALIGN ( 4096 ) : AT ( ADDR ( .text ) - BOOT_HIGHER_OFFSET )
 	{
 		* ( .multiboot )
 		* ( .text )
 	}
 
-	.data ALIGN ( 4096 ) :
+	.data ALIGN ( 4096 ) : AT ( ADDR ( .data ) - BOOT_HIGHER_OFFSET )
 	{
 		* ( .data )
 	}
 
-	.bss ALIGN ( 4096 ) :
+	.bss ALIGN ( 4096 ) : AT ( ADDR ( .bss ) - BOOT_HIGHER_OFFSET )
 	{
 		* ( .bss )
 

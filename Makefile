@@ -23,7 +23,7 @@ ARFLAGS=-r
 
 CCLIB=$(PREFIX)lib/gcc/$(TARGET)/$(CCVER)/
 
-CFLAGS= --std=gnu2x -mno-mmx -mno-sse -mno-sse2 -ffreestanding -nostdlib -MD -Wall -D__in_kernel -I$(realpath $(CURDIR))/include
+CFLAGS= -Wno-int-conversion --std=gnu2x -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -ffreestanding -nostdlib -MD -Wall -D__in_kernel -I$(realpath $(CURDIR))/include
 LDFLAGS= -L$(CCLIB) -lgcc --whole-archive
 
 DISKOUTSIZE=100

@@ -12,9 +12,12 @@
 #    GNU General Public License for more details.
 
 SRCS=\
-	entry.S
+	entry.S\
+	load_elf.c\
+	loadgdt.S\
+	switch_to_kernel.S
 
-OBJS=$(patsubst %.S,%.o,$(SRCS))
+OBJS=$(patsubst %.c,%.o,$(patsubst %.S,%.o,$(SRCS)))
 DEPS=$(OBJS:.o=.d)
 
 CFLAGS+= -m32
@@ -25,6 +28,8 @@ EMPTY_ARCH= boot.a
 
 all: $(OBJS) $(ARCHIVE) 
 
+%.o:%.c
+	$(CC) -c $(CFLAGS) -o $@ $<
 %.o:%.S
 	$(CC) -c $(CFLAGS) -o $@ $<
 
