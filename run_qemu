@@ -1,3 +1,22 @@
 #!/bin/bash
+#    Small Operating System
+#    Copyright (C) 2023 jmbert
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
 
-qemu-system-x86_64 -d int,cpu_reset -m 1024 -net none -hda kernel.dd -bios /usr/share/edk2-ovmf/x64/OVMF.fd 2>debug.log
+QEMU="$HOME/src/qemu/build/qemu-system-x86_64"
+if [ ! -x "$QEMU" ]; then
+	QEMU=$(which qemu-system-x86_64)
+fi
+
+echo "Running with $(realpath $QEMU)"
+
+$QEMU -cpu qemu64,+la57,check -net none -hda kernel.dd -bios /usr/share/edk2-ovmf/x64/OVMF.fd

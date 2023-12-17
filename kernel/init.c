@@ -13,9 +13,10 @@
 */
 
 #include <compiler.h>
+#include <mbinfo.h>
 
 __noreturn
-void kinit()
+void _start(mb_info_t *mbinfo)
 {
 
 	for (;;);

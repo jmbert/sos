@@ -12,33 +12,44 @@
     GNU General Public License for more details.
 */
 
-ENTRY(_start)
+ENTRY(_entry)
 
-HIGHER_HALF = 0xC0000000;
-KERNEL_VMA = HIGHER_HALF+1M;
+KERNEL_PMA = 1M;
+HIGH_OFFSET = 0xFF00000000000000;
+KERNEL_VMA = HIGH_OFFSET+KERNEL_PMA;
 
 SECTIONS
 {
-	. = KERNEL_VMA;
+	. = KERNEL_PMA;
 
-	.text : AT ( ADDR ( .text ) - KERNEL_VMA )
+	.boot :
+	{
+		boot.o ( .multiboot );
+		boot.o ( .text );
+		boot.o ( .data );
+		boot.o ( .bss );
+	} : boot
+
+	. += HIGH_OFFSET;
+
+	.text : AT ( ADDR ( .text ) - HIGH_OFFSET )
 	{
 		
 		* ( .text )
 		. = ALIGN ( 4096 );
-	}
+	} : text
 
-	.data : AT ( ADDR ( .data ) - KERNEL_VMA )
+	.data : AT ( ADDR ( .data ) - HIGH_OFFSET )
 	{
 		* ( .data )
-	}
+	} : data
 
-	.bss : AT ( ADDR ( .bss ) - KERNEL_VMA )
+	.bss : AT ( ADDR ( .bss ) - HIGH_OFFSET )
 	{
 		* ( .bss )
 
 		* ( COMMON )
-	}
+	} : data
 
 	_KERNEL_END = .;
 
@@ -46,4 +57,11 @@ SECTIONS
 	{
 		* ( .comment )
 	}
+}
+
+PHDRS
+{
+	boot PT_LOAD FILEHDR PHDRS;
+	text PT_LOAD;
+	data PT_LOAD;
 }

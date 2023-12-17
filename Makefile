@@ -23,7 +23,8 @@ ARFLAGS=-r
 
 CCLIB=$(PREFIX)lib/gcc/$(TARGET)/$(CCVER)/
 
-CFLAGS= -Wno-int-conversion --std=gnu2x -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -ffreestanding -nostdlib -MD -Wall -D__in_kernel -I$(realpath $(CURDIR))/include
+CFLAGS= -mcmodel=large -m64 -Wno-int-conversion --std=gnu2x -mno-red-zone -mno-mmx -mno-sse -mno-sse2 \
+		 -ffreestanding -nostdlib -MD -Wall -D__in_kernel -I$(realpath $(CURDIR))/include
 LDFLAGS= -L$(CCLIB) -lgcc --whole-archive
 
 DISKOUTSIZE=100
@@ -38,7 +39,7 @@ SUBDIRS= \
 SUBDIRTARGETS= $(patsubst %,%.d,$(SUBDIRS))
 
 SUBDIRSCLEAN= $(patsubst %,%.clean,$(SUBDIRTARGETS))
-SUBARCHIVES=$(patsubst %,%.a,$(SUBDIRS))
+SUBARCHIVES=$(patsubst %,%.o,$(SUBDIRS))
 
 all: $(SUBDIRTARGETS) kernel.elf kernel.dd
 

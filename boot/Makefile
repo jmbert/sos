@@ -13,18 +13,12 @@
 
 SRCS=\
 	entry.S\
-	load_elf.c\
-	loadgdt.S\
-	switch_to_kernel.S
+	loadgdt.S
 
 OBJS=$(patsubst %.c,%.o,$(patsubst %.S,%.o,$(SRCS)))
 DEPS=$(OBJS:.o=.d)
 
-CFLAGS+= -m32
-ARFLAGS= -Tbootlink.ld -melf_i386
-
-ARCHIVE= boot_kernel.elf
-EMPTY_ARCH= boot.a
+ARCHIVE= $(notdir $(CURDIR)).o
 
 all: $(OBJS) $(ARCHIVE) 
 
@@ -40,7 +34,5 @@ clean:
 $(ARCHIVE): $(OBJS)
 	$(AR) $(ARFLAGS) -o $@ $^
 	cp $@ ..
-	ar cru boot.a
-	cp boot.a ../
 
 -include $(DEPS)

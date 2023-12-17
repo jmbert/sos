@@ -12,15 +12,12 @@
 #    GNU General Public License for more details.
 
 SRCS=\
-	_start.S\
 	init.c
 
 OBJS=$(patsubst %.S,%.o,$(patsubst %.c,%.o,$(SRCS)))
 DEPS=$(OBJS:.o=.d)
 
-CFLAGS+=-mcmodel=large
-
-ARCHIVE= $(notdir $(CURDIR)).a
+ARCHIVE= $(notdir $(CURDIR)).o
 
 all: $(OBJS) $(ARCHIVE)
 

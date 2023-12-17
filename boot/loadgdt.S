@@ -11,6 +11,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 */
+.code32
 
 #include <gdtsegs.h>
 
@@ -22,6 +23,7 @@ loadGdt:
 	lgdt (gdtr)
 	jmp $GDT_KCODE,$.reloadSegments
 .reloadSegments:
+.code64	
 	mov $GDT_KDATA, %ax
 	mov %ax, %ds
 	mov %ax, %es

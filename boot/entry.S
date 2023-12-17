@@ -11,6 +11,7 @@
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 */
+.code32
 
 #include "mbheader.h"
 #include <mbinfo.h>
@@ -32,10 +33,12 @@ MB_HEADER
 
 MB_HEADER_PASS
 
-.section .data.low
+.section .data
 
 .align PGSTRUCT_SIZE
-boot_pml4:
+boot_pml5:
+.space PGSTRUCT_SIZE
+boot_pml5e:
 .space PGSTRUCT_SIZE
 boot_pml4e:
 .space PGSTRUCT_SIZE
@@ -44,7 +47,7 @@ boot_pdpte:
 boot_pde:
 .space PGSTRUCT_SIZE
 
-.section .bss.low
+.section .bss
 
 boot_stack_end:
 .space BOOT_STACK_SIZE
@@ -58,13 +61,12 @@ _entry:
 	/* 	So first we have to check that we have been booted 
 		by a multiboot-compatible header */
 	cmp $MB_BOOT_MAGIC, %eax
-	jne _catchexit
+	jne _fail
 
 	/* 	Give ourselves a stack
 	 	EBP is set to 0 to indicate the end of the stackframe
 		*/
 	mov $boot_stack_start, %esp
-	sub $BOOT_HIGHER_OFFSET, %esp
 	mov %ebx, %ebp /* Multiboot info structure for later use */
 
 	/* 	Now our job as the second-stage bootloader is 
@@ -89,31 +91,13 @@ _entry:
 		ECX: Number of page entries left
 		*/
 
-	mov $BOOT_KERNEL_BEGIN, %eax
-	mov $PGSIZE, %ebx
-	xor %edx, %edx
-	div %ebx
-	xor %edx, %edx
-	mov $PGSTRUCT_LEN, %ebx
-	div %ebx
-	xor %edx, %edx
-	mul %ebx
-	xor %edx, %edx
-	mov $PGSIZE, %ebx
-	mul %ebx
-	mov %eax, %esi
-
-
-	mov %esi, %eax
-	mov $PGSIZE, %ebx
-	xor %edx, %edx
-	div %ebx
-	mov %eax, %edi
-	
+	mov $KERNEL_PMA, %esi
+	and 0xFFE00000, %esi
+	mov %esi, %edi
+	GET_PAGE(%edi)
 	mov $0x200, %ecx
 
 	mov $boot_pde, %edx
-	sub $BOOT_HIGHER_OFFSET, %edx
 
 .fill_pdte:
 
@@ -128,97 +112,55 @@ _entry:
 
 	/* Now we just need to load everything in */
 
-	/* Zero edx so we can divide */
-	xor %edx, %edx
-
-	/* PD Entry: Identity */
-	mov $boot_pdpte, %edi
-	sub $BOOT_HIGHER_OFFSET, %edi
-	mov $BOOT_KERNEL_BEGIN, %eax
-	mov $PGSIZE, %ebx
-	div %ebx
-	xor %edx, %edx
-	mov $PGSTRUCT_LEN, %ebx
-	div %ebx
-	mov %eax, %ecx
+	/* PD Entry */
+	mov $boot_pdpte, %edx
+	mov $KERNEL_PMA, %edi
+	GET_PTAB(%edi)
 
 	mov $boot_pde, %eax
-	sub $BOOT_HIGHER_OFFSET, %eax
-	or $PML4E_P, %eax
-	or $PML4E_RW, %eax
-	mov %eax, (%edi,%ecx,PGSTRUCTENTRY_SIZE)
+	or $PDE_P, %eax
+	or $PDE_RW, %eax
+	mov %eax, (%edx,%edi,PGSTRUCTENTRY_SIZE)
 
-	xor %edx, %edx
 
-	/* PDPT Entry: Identity */
-	mov $boot_pml4e, %edi
-	sub $BOOT_HIGHER_OFFSET, %edi
-	mov $BOOT_KERNEL_BEGIN, %eax
-	mov $PGSIZE, %ebx
-	div %ebx
-	xor %edx, %edx
-	mov $PGSTRUCT_LEN, %ebx
-	div %ebx
-	xor %edx, %edx
-	div %ebx
-	mov %eax, %ecx
+	/* PDPT Entry */
+	mov $boot_pml4e, %edx
+	mov $KERNEL_PMA, %edi
+	GET_PDIR(%edi)
 
 	mov $boot_pdpte, %eax
-	sub $BOOT_HIGHER_OFFSET, %eax
-	or $PML5E_P, %eax
-	or $PML5E_RW, %eax
-	mov %eax, (%edi,%ecx,PGSTRUCTENTRY_SIZE)
+	or $PDPTE_P, %eax
+	or $PDPTE_RW, %eax
+	mov %eax, (%edx,%edi,PGSTRUCTENTRY_SIZE)
 
-	/* PDPT Entry: Higher */
-	mov $boot_pml4e, %edi
-	sub $BOOT_HIGHER_OFFSET, %edi
-	mov $BOOT_KERNEL_BEGIN, %eax
-	add $BOOT_HIGHER_OFFSET, %eax
-	mov $PGSIZE, %ebx
-	div %ebx
-	xor %edx, %edx
-	mov $PGSTRUCT_LEN, %ebx
-	div %ebx
-	xor %edx, %edx
-	div %ebx
-	mov %eax, %ecx
-
-	mov $boot_pdpte, %eax
-	sub $BOOT_HIGHER_OFFSET, %eax
-	or $PML5E_P, %eax
-	or $PML5E_RW, %eax
-	mov %eax, (%edi,%ecx,PGSTRUCTENTRY_SIZE)
-
-	xor %edx, %edx
 	/* PML4 Entry */
-	mov $boot_pml4, %edi
-	sub $BOOT_HIGHER_OFFSET, %edi
-	mov $BOOT_KERNEL_BEGIN, %eax
-	mov $PGSIZE, %ebx
-	div %ebx
-	xor %edx, %edx
-	mov $PGSTRUCT_LEN, %ebx
-	div %ebx
-	xor %edx, %edx
-	div %ebx
-	xor %edx, %edx
-	div %ebx
-	mov %eax, %ecx
+	mov $boot_pml5e, %edx
+	mov $KERNEL_PMA, %edi
+	GET_PDPTR(%edi)
 
 	mov $boot_pml4e, %eax
-	sub $BOOT_HIGHER_OFFSET, %eax
+	or $PML4E_P, %eax
+	or $PML4E_RW, %eax
+	mov %eax, (%edx,%edi,PGSTRUCTENTRY_SIZE)
+
+	/* PML5 Entry: Identity */
+	mov $boot_pml5, %edx
+	mov $KERNEL_PMA, %edi
+	GET_PML4(%edi)
+
+	mov $boot_pml5e, %eax
 	or $PML5E_P, %eax
 	or $PML5E_RW, %eax
-	mov %eax, (%edi,%ecx,PGSTRUCTENTRY_SIZE)
+	mov %eax, (%edx,%edi,PGSTRUCTENTRY_SIZE)
 
-	/* PML4 */
-	mov $boot_pml4, %eax
-	sub $BOOT_HIGHER_OFFSET, %eax
+	/* PML5 */
+	mov $boot_pml5, %eax
 	mov %eax, %cr3
 
 	/* Enable Page Address Extension */
 	mov %cr4, %eax
 	or $CR4_PAE, %eax
+	or $CR4_LA57, %eax
 	mov %eax, %cr4
 
 	/* Enable LME bit in EFER MSR */
@@ -232,44 +174,55 @@ _entry:
 	or $CR0_PG, %eax
 	mov %eax, %cr0
 
-	add $BOOT_HIGHER_OFFSET, %esp /* Higher stack */
-
 	/* 	We are now in compatability mode
 		Once we reload the segments, we will be in long mode 
 		Before we do this, we will set up the next stage
 		in it's own page hierarchy
 	 */
 
-	mov $.higher, %eax
-	jmp *%eax
-.higher:
+	 
+.extern loadGdt
+	pushl 0x0
+	call loadGdt
+.code64
+	/* PML5 Entry: Higher */
+	mov $boot_pml5, %rdx
+	movabs $KERNEL_VMA, %rdi
+	GET_PML4(%rdi)
 
-	/*	We need to unmap the identity page 
+	mov $boot_pml5e, %rax
+	or $PML5E_P, %rax
+	or $PML5E_RW, %rax
+	mov %rax, (%rdx,%rdi,PGSTRUCTENTRY_SIZE)
+	
+
+	movabs $HIGH_OFFSET, %rax
+	add %rax, %rsp
+	mov %rbp, %rbx /* Multiboot structure from earlier */
+	xor %rbp, %rbp
+
+	add $.higher, %rax
+	jmp *%rax
+
+.higher:
+	/*	We need to unmap the identity pml5e 
 		for cleanliness
 	 */
+	mov $boot_pml5, %rdx
+	mov $KERNEL_PMA, %rdi
+	GET_PML4(%rdi)
+
+	movq $0, (%rdx,%rdi,PGSTRUCTENTRY_SIZE)
 	
-	mov $boot_pml4e, %edi
-	sub $BOOT_HIGHER_OFFSET, %edi
-	mov $BOOT_KERNEL_BEGIN, %eax
-	mov $PGSIZE, %ebx
-	div %ebx
-	xor %edx, %edx
-	mov $PGSTRUCT_LEN, %ebx
-	div %ebx
-	xor %edx, %edx
-	div %ebx
-	mov %eax, %ecx
-	mov $0, (%edi,%ecx,PGSTRUCTENTRY_SIZE)
+	/*	Now we just map in literally all of physical memory
+		Easy, right?
+	 */
 
-.extern load_elf
-	push $boot_pde
-	push %ebp /* Multiboot info structure */
-	xor %ebp, %ebp /* No stackframe */
-	call load_elf
+	mov %rbx, %rdi /* Multiboot info */
+	movabs $_start, %rax
+	jmp *%rax
 
-
-
-_catchexit:
+_fail:
 	cli
 	hlt
-	jmp _catchexit
+	jmp _fail
