@@ -6,3 +6,5 @@ sysroot
 **.dd
 **.log
 .vscode
+*.efi
+*.EFI

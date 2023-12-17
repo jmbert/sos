@@ -32,6 +32,7 @@ n
 
 
 
+
 t
 1
 
@@ -42,9 +43,13 @@ LODEV=`sudo losetup -o $[2048*512] --sizelimit $[16*1024*1024] -f $DISKFILE --sh
 sudo mkfs.fat -F 16 $LODEV
 
 sudo mount --mkdir $LODEV /mnt/loopmnt
+sudo mkdir /mnt/loopmnt/grub
+sudo mkdir /mnt/loopmnt/EFI
+sudo mkdir /mnt/loopmnt/EFI/grub
 
-sudo grub-install --modules=part_msdos --target=x86_64-efi --boot-directory=/mnt/loopmnt --efi-directory=/mnt/loopmnt --bootloader-id=GRUB $LODEV 
+sudo grub-mkstandalone -O x86_64-efi -o BOOTX64.EFI "boot/grub/grub.cfg=grub_memdisk.cfg"
 
+sudo cp BOOTX64.EFI /mnt/loopmnt/EFI/grub
 sudo cp grub.cfg /mnt/loopmnt/grub/grub.cfg
 sudo cp boot_kernel.elf /mnt/loopmnt/boot_kernel
 sudo cp kernel.elf /mnt/loopmnt/kernel
