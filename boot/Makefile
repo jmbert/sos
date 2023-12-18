@@ -30,6 +30,7 @@ all: $(OBJS) $(ARCHIVE)
 clean:
 	-rm $(OBJS)
 	-rm $(ARCHIVE)
+	-rm $(DEPS)
 
 $(ARCHIVE): $(OBJS)
 	$(AR) $(ARFLAGS) -o $@ $^
