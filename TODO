@@ -1,0 +1,8 @@
+### TODO
+	- [x] Enter Long Mode
+	- [ ] Write Basic Serial Printer
+	- [ ] Set up Physical Memory Manager
+		- [ ] Translate Multiboot memory map to my own memory map
+		- [ ] Map in regions set up by boot
+		- [ ] Provide functions for allocating more regions
+	- [ ] 

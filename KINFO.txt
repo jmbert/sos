@@ -1,0 +1,28 @@
+The General Structure is this:
+
+boot/:
+	Manages Protected mode boot and moving into long mode.
+	Jumps to the kernel
+
+kernel/:
+	The first long mode code
+	Manages the long mode boot and initialises all the subsystems
+
+pmm/:
+	Manages physical memory allocaters
+
+vmm/:
+	Manages virtual memory allocaters
+	Also contains kmalloc and kfree
+
+The Memory Structure is this:
+
+User Mapping: Different per process:
+
+	00000000'00000000-00007FFF'FFFFFFFF: User mode (can be used for whatever by the user, should all be user mode permissable)
+
+Kernel Mappings: Saved across procs:
+
+	FFFF8880'00000000-FFFFC87F'FFFFFFFF: 64 TB Direct Physical Mapping
+
+	FFFFFFFF'80000000-FFFFFFFF'FFFFFFFF: The Kernel (also the last PML4E)
