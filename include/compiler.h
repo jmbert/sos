@@ -21,6 +21,12 @@
 
 #define __align(_n) [[gnu::aligned(_n)]]
 
-#define __fail __builtin_unreachable
+
+#ifdef __ASSEMBLER__
+	#define __fail ud2
+#else
+	#define __fail __builtin_unreachable
+#endif
+
 
 #endif

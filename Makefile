@@ -33,8 +33,8 @@ DISKOUTCHUNKS=1048576
 export CC AR AS LD CFLAGS ARFLAGS
 
 SUBDIRS= \
-	kernel\
-	boot
+	boot\
+	kernel
 
 SUBDIRTARGETS= $(patsubst %,%.d,$(SUBDIRS))
 

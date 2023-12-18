@@ -15,17 +15,8 @@
 #ifndef _PGFLAGS_H
 #define _PGFLAGS_H
 
-#define PML5_PWT 1<<3
-#define PML5_PCD 1<<4
-
-#define PML5E_P 1<<0 
-#define PML5E_RW 1<<1 
-#define PML5E_US 1<<2 
-#define PML5E_PWT 1<<3 
-#define PML5E_PCD 1<<4 
-#define PML5E_A 1<<5 
-#define PML5E_R 1<<11 
-#define PML5E_XD 1<<63 
+#define PML4_PWT 1<<3
+#define PML4_PCD 1<<4
 
 #define PML4E_P 1<<0 
 #define PML4E_RW 1<<1 

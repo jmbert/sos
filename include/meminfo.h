@@ -12,22 +12,23 @@
     GNU General Public License for more details.
 */
 
-#include <compiler.h>
-#include <mbinfo.h>
-#include <kinfo.h>
-
 /*
-	Jobs to do:
-		- Initialise Kprint for debugging
-		- Initialise Physical Memory Manager
-		- Initialise Virtual Memory Manager
-		- Initialise Heap Manager
+	See KINFO.txt for where these values come from
 */
 
-__noreturn
-void _start(mb_info_t *mbinfo)
-{
-	for (;;);
+#ifndef _MEMINFO_H
+#define _MEMINFO_H
 
-	__builtin_unreachable();
-}
+#define USER_VMA_BEGIN 		0x0000000000000000
+#define USER_VMA_END 		0x00007FFFFFFFFFFF
+
+#define PHYS_VMA_BEGIN 		0xFFFF888000000000
+#define PHYS_VMA_END		0xFFFFC87FFFFFFFFF
+#define PHYS_VMA_SIZE		0x0000400000000000
+
+#define physaddr_begin PHYS_VMA_BEGIN
+
+#define KERNEL_VMA_BEGIN 	0xFFFFFFFF80000000
+#define KERNEL_VMA_END 		0xFFFFFFFFFFFFFFFF
+
+#endif

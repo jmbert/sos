@@ -12,7 +12,8 @@
 #    GNU General Public License for more details.
 
 SRCS=\
-	init.c
+	init.c\
+	kinfo.c
 
 OBJS=$(patsubst %.S,%.o,$(patsubst %.c,%.o,$(SRCS)))
 DEPS=$(OBJS:.o=.d)

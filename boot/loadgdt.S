@@ -13,6 +13,7 @@
 */
 .code32
 
+#include <gdtflags.h>
 #include <gdtsegs.h>
 
 .section .text
